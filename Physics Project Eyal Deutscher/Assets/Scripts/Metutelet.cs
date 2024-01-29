@@ -13,9 +13,11 @@ public class Metutelet : MonoBehaviour
     [SerializeField] float _speedFactor = 1;
     [SerializeField] float _gravity = 9.81f;
     [SerializeField] float _moveToSidemount = 0.001f;
+
     [Header("Do Not Edit")]
     [SerializeField] float _startingHight;
     [SerializeField] float _maxHight;
+    [SerializeField] float _maxAcceleration;
     //use physics to make the ball drop down, you must keep the ball at a regular distance from the top part
     //when the ball is too far move it closer to the center, if it is too close move it to the current side
     //When the ball swings to the right side, it will go right if it goes up it will go up
@@ -48,12 +50,12 @@ public class Metutelet : MonoBehaviour
         if (_isGoingUp)
         {
             //going up
-            this.transform.position += new Vector3(0, _acceleration, 0);
+            this.transform.position += new Vector3(0, _acceleration/2, 0);
         }
         else
         {
             //going down
-            this.transform.position -= new Vector3(0, _acceleration, 0);
+            this.transform.position -= new Vector3(0, _acceleration/2, 0);
         }
     }
     private void MoveBallLeftRight()
@@ -62,12 +64,12 @@ public class Metutelet : MonoBehaviour
         if ((_isOnRightSide & _isGoingUp) || (!_isOnRightSide & !_isGoingUp))
         {
             //going right
-            this.transform.position += new Vector3(+_moveToSidemount, 0, 0);
+            this.transform.position += new Vector3(_acceleration, 0, 0);
         }
         else
         {
             //going left
-            this.transform.position -= new Vector3(-_moveToSidemount, 0, 0);
+            this.transform.position -= new Vector3(-_acceleration, 0, 0);
         }
     }
     private void ApplyAcceleration()
@@ -84,6 +86,12 @@ public class Metutelet : MonoBehaviour
             _acceleration += Time.fixedDeltaTime * _speedFactor;
         }
     }
+    private void GoDown()
+    {
+        //change dicrection
+        _isGoingUp = false;
+        _acceleration = 0;
+    }
     private void FixedUpdate()
     {
         MoveBallLeftRight();
@@ -93,9 +101,7 @@ public class Metutelet : MonoBehaviour
         //Adjust Acceleration
         if (_acceleration < 0)
         {
-            //change dicrection
-            _isGoingUp = false;
-            _acceleration = 0;
+            GoDown();
             //if(_maxHight < this.transform.position.y)
             //{
                 _maxHight = this.transform.position.y;
@@ -106,8 +112,11 @@ public class Metutelet : MonoBehaviour
         //set direction ball is going to
         if (_isGoingUp)
         {
-            ////if is over the top, stop going up
-            //if (this.transform.position.y > _pillarTop.position.y)
+            //if is over the top, stop going up
+            if (this.transform.position.y > _pillarTop.position.y)
+            {
+                GoDown();
+            }
         }
         else
         {
@@ -116,6 +125,7 @@ public class Metutelet : MonoBehaviour
             {
                 _isGoingUp = true;
                 _isOnRightSide = !_isOnRightSide;
+                _maxAcceleration = _acceleration;
                 this.transform.position = new Vector3(transform.position.x, (_pillarTop.position.y - _maxRadius), transform.position.z);
             }
         }

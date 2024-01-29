@@ -617,11 +617,12 @@ MonoBehaviour:
   _acceleration: 0
   _isGoingUp: 0
   _isOnRightSide: 0
-  _speedFactor: 0.1
+  _speedFactor: 0.0001
   _gravity: 0.001
   _moveToSidemount: 0.001
   _startingHight: 0
   _maxHight: 0
+  _maxAcceleration: 0
 --- !u!1 &1970583468
 GameObject:
   m_ObjectHideFlags: 0
