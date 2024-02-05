@@ -367,7 +367,6 @@ GameObject:
   - component: {fileID: 1226815925}
   - component: {fileID: 1226815924}
   - component: {fileID: 1226815923}
-  - component: {fileID: 1226815922}
   m_Layer: 0
   m_Name: Background
   m_TagString: Untagged
@@ -375,22 +374,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1226815922
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1226815921}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 108c3ad2b7f01c04d98fe64cba705c13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _mass: 0
-  _acceleration: 0
-  _friction: 0
-  _currentMovementForce: {x: 0, y: 0, z: 0}
 --- !u!23 &1226815923
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -549,10 +532,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1857315652}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 108c3ad2b7f01c04d98fe64cba705c13, type: 3}
+  m_Script: {fileID: 11500000, guid: 9d2cccd958f3a3441a72706bbe79b8c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _mass: 1
-  _acceleration: 0
   _friction: 0
-  _currentMovementForce: {x: 0, y: 3, z: 0}
+  _hasGravity: 1
+  _gravityForce: {x: 0, y: -10}
+  _acceleration: 0
+  _currentMovementForce: {x: 0, y: 0}
+  _activeForces:
+  - {x: 0, y: 50}
+  _nextActiveForces: []
