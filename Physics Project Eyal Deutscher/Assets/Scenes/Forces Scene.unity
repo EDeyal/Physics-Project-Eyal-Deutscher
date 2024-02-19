@@ -173,7 +173,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0
   far clip plane: 1000
   field of view: 60
   orthographic: 1
@@ -472,6 +472,7 @@ MonoBehaviour:
   _rigidbody2D: {fileID: 1857315657}
   _mouseDragStrength: 5
   _camera: {fileID: 385396131}
+  _lineRenderer: {fileID: 1620950020}
   _startingPoint: {x: 0, y: 0, z: 0}
   _endPoint: {x: 0, y: 0, z: 0}
 --- !u!4 &1620950019
