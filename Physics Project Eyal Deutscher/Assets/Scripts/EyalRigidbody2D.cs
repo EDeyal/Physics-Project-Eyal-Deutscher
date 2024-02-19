@@ -41,45 +41,50 @@ public class EyalRigidbody2D : MonoBehaviour
             _accelerationForce += _gravityForce * _mass *Time.fixedDeltaTime;
         }
         _velocity += _accelerationForce*Time.fixedDeltaTime;
+        _velocity = UseDragEffectOnVector(_velocity);
     }
     private void CalculateAccelerationForce()
     {
         foreach (var force in _activeForces)
         {
-            _accelerationForce += force;
+            _velocity += force * Time.fixedDeltaTime;
         }
+    }
+    private Vector2 UseDragEffectOnVector(Vector2 vector2)
+    {
+        float x = vector2.x;
+        if (x > 0)
+        {
+            x -= _drag * Time.fixedDeltaTime;
+            if (x < 0)
+                x = 0;
+        }
+        else if (x < 0)
+        {
+            x += _drag * Time.fixedDeltaTime;
+            if (x > 0)
+                x = 0;
+        }
+        float y = vector2.y;
+        if (y > 0)
+        {
+            y -= _drag * Time.fixedDeltaTime;
+            if (y < 0)
+                y = 0;
+        }
+        else if (y < 0)
+        {
+            y += _drag * Time.fixedDeltaTime;
+            if (y > 0)
+                y = 0;
+        }
+        return new Vector2(x, y);
     }
     private void ReduceForcesEffects()
     {
         for (int i = 0; i < _activeForces.Count; i++)
         {
-            float x = _activeForces[i].x;
-            if (x > 0)
-            {
-                x -= _drag * Time.fixedDeltaTime;
-                if (x < 0)
-                    x = 0;
-            }
-            else if (x < 0)
-            {
-                x += _drag * Time.fixedDeltaTime;
-                if (x > 0)
-                    x = 0;
-            }
-            float y = _activeForces[i].y;
-            if (y > 0)
-            {
-                y -= _drag * Time.fixedDeltaTime;
-                if (y < 0)
-                    y = 0;
-            }
-            else if (y < 0)
-            {
-                y += _drag * Time.fixedDeltaTime;
-                if (y > 0)
-                    y = 0;
-            }
-            Vector2 newVector = new Vector2(x, y);
+            Vector2 newVector = UseDragEffectOnVector(_activeForces[i]);
             _activeForces[i] = newVector;
             if (newVector == Vector2.zero)
             {
