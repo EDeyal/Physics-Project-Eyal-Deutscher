@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(EyalCollider))]
 public class EyalRigidbody2D : MonoBehaviour
 {
     [SerializeField] float _mass;
@@ -10,43 +11,31 @@ public class EyalRigidbody2D : MonoBehaviour
     [SerializeField] Vector2 _gravityForce;
     [SerializeField] Vector2 _lastPosition;
     public event Action<Vector2> OnPositionChanged;
-    [SerializeField] bool _isTrigger;
 
     [Header("Do not Change, read only fields")]
     [SerializeField] Vector2 _accelerationForce;
     [SerializeField] Vector2 _velocity;
     [SerializeField] List<Vector2> _activeForces;
     [SerializeField] List<Vector2> _nextActiveForces;
-    Renderer _renderer;
+    EyalCollider _collider;
 
-    public bool IsTrigger => _isTrigger;
-    public Bounds Bounds
-    {
-        get
-        {
-            return _renderer.bounds;
-        }
-    }
+    public EyalCollider Collider => _collider;
+
     private void Awake()
     {
         if (_mass == 0)
             throw new System.Exception($"Mass of Object{this.gameObject.name} is 0");
+
+        _collider = gameObject.GetComponent<EyalCollider>();
+        if(_collider == null)
+            throw new System.Exception($"Rigidbody {gameObject.name} has no collider");
+        _collider.SetRigidbody(this);
     }
-    private void OnValidate()
-    {
-        if (_renderer == null)
-        {
-            gameObject.GetComponent<Renderer>();
-        }
-    }
-    private void OnDestroy()
-    {
-        CollisionManager.Instance.UnrigisterRigidbody(this);
-    }
+
+
     private void Start()
     {
         _lastPosition = transform.position;
-        CollisionManager.Instance.RigisterRigidbody(this);
     }
     public void AddForce(Vector2 force)
     {

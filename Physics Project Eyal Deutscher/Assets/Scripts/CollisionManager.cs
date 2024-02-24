@@ -3,25 +3,24 @@ using UnityEngine;
 
 public class CollisionManager : MonoSingleton<CollisionManager>
 {
-    private List<EyalRigidbody2D> _rigidbodies;
-    //private List<>
+    private List<EyalCollider> _colliders;
 
     public override void Awake()
     {
         base.Awake();
-        _rigidbodies = new List<EyalRigidbody2D>();
+        _colliders = new List<EyalCollider>();
     }
-    public void RigisterRigidbody(EyalRigidbody2D rigidbody)
+    public void RigisterCollider(EyalCollider collider)
     {
-        if (_rigidbodies.Contains(rigidbody))
+        if (_colliders.Contains(collider))
         {
-            throw new System.Exception($"Rigidbody {rigidbody.gameObject.name} is already in rigidbody list");
+            throw new System.Exception($"Rigidbody {collider.gameObject.name} is already in rigidbody list");
         }
-        _rigidbodies.Add(rigidbody);
+        _colliders.Add(collider);
     }
-    public void UnrigisterRigidbody(EyalRigidbody2D rigidbody)
+    public void UnrigisterCollider(EyalCollider collider)
     {
-        _rigidbodies.Remove(rigidbody);
+        _colliders.Remove(collider);
     }
 
     private void FixedUpdate()
@@ -30,43 +29,62 @@ public class CollisionManager : MonoSingleton<CollisionManager>
     }
     private void DetectCollisions()
     {
-
-        EyalRigidbody2D rb1;
-        EyalRigidbody2D rb2;
+        EyalCollider collider1;
+        EyalCollider collider2;
         bool triggerOverlap = false;
+        bool hasCollided = true;
 
         //AABB collision detection
-        for (int i = 0; i < _rigidbodies.Count; i++)
+        for (int i = 0; i < _colliders.Count; i++)
         {
-            rb1 = _rigidbodies[i];
+            collider1 = _colliders[i];
 
-            for (int j = 0; j +1 < _rigidbodies.Count; j++)
+            for (int j = 0; j < _colliders.Count; j++)
             {
-                rb2 = _rigidbodies[j];
-                if (AABBCollision(rb1, rb2,out triggerOverlap))
+                collider2 = _colliders[j];
+                if (collider1 == collider2)
                 {
-                    ResolveCollisions(rb1,rb2,triggerOverlap);
+                    continue;
+                }
+                if (AABBCollision(collider1, collider2,out hasCollided,out triggerOverlap))
+                {
+                    if (hasCollided)
+                    { 
+                        ResolveCollisions(collider1,collider2,triggerOverlap);
+                    }
                 }
             }
         }
     }
-    private bool AABBCollision(EyalRigidbody2D rb1, EyalRigidbody2D rb2, out bool triggerOverlap)
+    private bool AABBCollision(EyalCollider collider1, EyalCollider collider2,out bool hasCollided, out bool triggerOverlap)
     {
         triggerOverlap = false;
 
+        if (collider1.Rigidbody == null && collider2.Rigidbody == null)
+        {
+            //no rigidbodies are involved
+            hasCollided = false;
+            return false;
+        }
+
         //get if the objects are triggers
-        bool isTrigger1 = rb1.IsTrigger;
-        bool isTrigger2 = rb2.IsTrigger;
+        bool isTrigger1 = collider1.IsTrigger;
+        bool isTrigger2 = collider2.IsTrigger;
 
         if (isTrigger1 && isTrigger2)
         {
             //should not collide
+            hasCollided = false;
             return false;
+        }
+        else
+        {
+            hasCollided = true;
         }
 
         //get the sizeOfBounds for the objects
-        Bounds rb1Bounds = rb1.Bounds;
-        Bounds rb2Bounds = rb2.Bounds;
+        Bounds rb1Bounds = collider1.Bounds;
+        Bounds rb2Bounds = collider2.Bounds;
 
         //check for overlap
         bool overlapX = rb1Bounds.min.x <= rb2Bounds.max.x && rb1Bounds.max.x >= rb2Bounds.min.x;
@@ -81,14 +99,10 @@ public class CollisionManager : MonoSingleton<CollisionManager>
             {
                     triggerOverlap = true;
             }
-
         }
-
-
         return _isOverlaping;
-
     }
-    private void ResolveCollisions(EyalRigidbody2D rb1, EyalRigidbody2D Rb2,bool isTriggerCollision)
+    private void ResolveCollisions(EyalCollider collider1, EyalCollider collider2,bool isTriggerCollision)
     {
         if (isTriggerCollision)
         {

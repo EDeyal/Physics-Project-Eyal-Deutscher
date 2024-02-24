@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 2135931}
   - component: {fileID: 2135930}
   - component: {fileID: 2135929}
-  - component: {fileID: 2135932}
+  - component: {fileID: 2135933}
   m_Layer: 0
   m_Name: Goal
   m_TagString: Untagged
@@ -207,7 +207,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2135932
+--- !u!114 &2135933
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -216,19 +216,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2135927}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d2cccd958f3a3441a72706bbe79b8c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f974528faaafb4e85cfbcd6e5b62a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mass: 1
-  _drag: 0
-  _hasGravity: 0
-  _gravityForce: {x: 0, y: 0}
-  _lastPosition: {x: 0, y: 0}
   _isTrigger: 1
-  _accelerationForce: {x: 0, y: 0}
-  _velocity: {x: 0, y: 0}
-  _activeForces: []
-  _nextActiveForces: []
 --- !u!1 &339769875
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,19 +313,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 339769875}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d2cccd958f3a3441a72706bbe79b8c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f974528faaafb4e85cfbcd6e5b62a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mass: 1
-  _drag: 0
-  _hasGravity: 0
-  _gravityForce: {x: 0, y: 0}
-  _lastPosition: {x: 0, y: 0}
   _isTrigger: 0
-  _accelerationForce: {x: 0, y: 0}
-  _velocity: {x: 0, y: 0}
-  _activeForces: []
-  _nextActiveForces: []
 --- !u!1 &385396129
 GameObject:
   m_ObjectHideFlags: 0
@@ -389,7 +371,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 11
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -546,19 +528,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 408831684}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d2cccd958f3a3441a72706bbe79b8c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f974528faaafb4e85cfbcd6e5b62a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mass: 1
-  _drag: 0
-  _hasGravity: 0
-  _gravityForce: {x: 0, y: 0}
-  _lastPosition: {x: 0, y: 0}
   _isTrigger: 0
-  _accelerationForce: {x: 0, y: 0}
-  _velocity: {x: 0, y: 0}
-  _activeForces: []
-  _nextActiveForces: []
 --- !u!1 &760826363
 GameObject:
   m_ObjectHideFlags: 0
@@ -767,19 +740,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 857892580}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d2cccd958f3a3441a72706bbe79b8c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f974528faaafb4e85cfbcd6e5b62a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mass: 1
-  _drag: 0
-  _hasGravity: 0
-  _gravityForce: {x: 0, y: 0}
-  _lastPosition: {x: 0, y: 0}
   _isTrigger: 0
-  _accelerationForce: {x: 0, y: 0}
-  _velocity: {x: 0, y: 0}
-  _activeForces: []
-  _nextActiveForces: []
 --- !u!1 &994963034
 GameObject:
   m_ObjectHideFlags: 0
@@ -873,19 +837,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 994963034}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d2cccd958f3a3441a72706bbe79b8c2, type: 3}
+  m_Script: {fileID: 11500000, guid: 73f974528faaafb4e85cfbcd6e5b62a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _mass: 1
-  _drag: 0
-  _hasGravity: 0
-  _gravityForce: {x: 0, y: 0}
-  _lastPosition: {x: 0, y: 0}
   _isTrigger: 0
-  _accelerationForce: {x: 0, y: 0}
-  _velocity: {x: 0, y: 0}
-  _activeForces: []
-  _nextActiveForces: []
 --- !u!1 &1226815921
 GameObject:
   m_ObjectHideFlags: 0
@@ -1131,6 +1086,7 @@ GameObject:
   - component: {fileID: 1857315655}
   - component: {fileID: 1857315654}
   - component: {fileID: 1857315657}
+  - component: {fileID: 1857315658}
   m_Layer: 0
   m_Name: Ball
   m_TagString: Untagged
@@ -1220,11 +1176,23 @@ MonoBehaviour:
   _hasGravity: 0
   _gravityForce: {x: 0, y: -10}
   _lastPosition: {x: 0, y: 0}
-  _isTrigger: 0
   _accelerationForce: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
   _activeForces: []
   _nextActiveForces: []
+--- !u!114 &1857315658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1857315652}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73f974528faaafb4e85cfbcd6e5b62a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isTrigger: 0
 --- !u!1 &2019390472
 GameObject:
   m_ObjectHideFlags: 0

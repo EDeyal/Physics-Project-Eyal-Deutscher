@@ -3,7 +3,34 @@ using UnityEngine;
 public class EyalCollider : MonoBehaviour
 {
     [SerializeField] bool _isTrigger;
+    EyalRigidbody2D _rigidbody;
+
+    public EyalRigidbody2D Rigidbody => _rigidbody;
+    public bool IsTrigger => _isTrigger;
     Renderer _renderer;
+
+    public Bounds Bounds
+    {
+        get
+        {
+            return _renderer.bounds;
+        }
+    }
+    private void OnValidate()
+    {
+        if (_renderer == null)
+        {
+            gameObject.GetComponent<Renderer>();
+        }
+    }
+    public void Start()
+    {
+        CollisionManager.Instance.RigisterCollider(this);
+    }
+    private void OnDestroy()
+    {
+        CollisionManager.Instance.UnrigisterCollider(this);
+    }
     //event for trigger interactions
     public delegate void TriggerEventHandler(EyalCollider other);
     public event TriggerEventHandler TriggerEntered;
@@ -16,8 +43,11 @@ public class EyalCollider : MonoBehaviour
     {
         _renderer = GetComponent<Renderer>();
     }
-
-    private void OnTriggerEnter(EyalCollider other)
+    public void SetRigidbody(EyalRigidbody2D rigidbody)
+    {
+        _rigidbody = rigidbody;
+    }
+    private void OnEyalTriggerEnter(EyalCollider other)
     {
         if (_isTrigger)
         {
@@ -25,7 +55,7 @@ public class EyalCollider : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(EyalCollider other)
+    private void OnEyalCollisionEnter(EyalCollider other)
     {
         if (!_isTrigger)
         { 
