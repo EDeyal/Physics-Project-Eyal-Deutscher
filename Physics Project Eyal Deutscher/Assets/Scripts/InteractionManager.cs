@@ -25,6 +25,7 @@ public class InteractionManager : MonoBehaviour
             _startingPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
             //Debug.Log("Mouse Clicked Down");
             _isDrawing = true;
+            _startingPoint.z = 1;
         }
         if (_isDrawing)
         {

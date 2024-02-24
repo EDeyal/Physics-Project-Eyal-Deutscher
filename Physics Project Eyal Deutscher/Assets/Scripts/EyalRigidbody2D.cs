@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,6 +10,8 @@ public class EyalRigidbody2D : MonoBehaviour
     [SerializeField] float _drag;
     [SerializeField] bool _hasGravity;
     [SerializeField] Vector2 _gravityForce;
+    [SerializeField] Vector2 _lastPosition;
+    public event Action<Vector2> OnPositionChanged;
 
     [Header("Borders")]
     [SerializeField]float _yTop;
@@ -25,6 +28,10 @@ public class EyalRigidbody2D : MonoBehaviour
     {
         if (_mass == 0)
             throw new System.Exception($"Mass of Object{this.gameObject.name} is 0");
+    }
+    private void Start()
+    {
+        _lastPosition = transform.position;
     }
     public void AddForce(Vector2 force)
     {
@@ -50,82 +57,74 @@ public class EyalRigidbody2D : MonoBehaviour
             _velocity += force * Time.fixedDeltaTime;
         }
     }
-    private Vector2 UseDragEffectOnVector(Vector2 vector2)
+    private Vector2 UseDragEffectOnVector(Vector2 vector)
     {
-        float x = vector2.x;
-        if (x > 0)
-        {
-            x -= _drag * Time.fixedDeltaTime;
-            if (x < 0)
-                x = 0;
-        }
-        else if (x < 0)
-        {
-            x += _drag * Time.fixedDeltaTime;
-            if (x > 0)
-                x = 0;
-        }
-        float y = vector2.y;
-        if (y > 0)
-        {
-            y -= _drag * Time.fixedDeltaTime;
-            if (y < 0)
-                y = 0;
-        }
-        else if (y < 0)
-        {
-            y += _drag * Time.fixedDeltaTime;
-            if (y > 0)
-                y = 0;
-        }
-        return new Vector2(x, y);
+        //drag for the current frame
+        float dragDeltaTime = _drag * Time.fixedDeltaTime;
+
+        //if the x vector is larger then the drag, reduce the vector length, if it is smaller, make it 0.
+        float newX = Mathf.Abs(vector.x) > dragDeltaTime ? vector.x - Mathf.Sign(vector.x) * dragDeltaTime : 0f;
+
+        //if the y vector is larger then the drag, reduce the vector length, if it is smaller, make it 0.
+        float newY = Mathf.Abs(vector.y) > dragDeltaTime ? vector.y - Mathf.Sign(vector.y) * dragDeltaTime : 0f;
+       
+        //return a new vector
+        return new Vector2(newX, newY);
     }
     private void ReduceForcesEffects()
     {
-        for (int i = 0; i < _activeForces.Count; i++)
+        foreach (var force in _activeForces)
         {
-            Vector2 newVector = UseDragEffectOnVector(_activeForces[i]);
-            _activeForces[i] = newVector;
-            if (newVector == Vector2.zero)
+            Vector2 newVector = UseDragEffectOnVector(force);
+            //if a vector is 0 it does not effect the equasion and need to be removed.s
+            if (newVector != Vector2.zero)
             {
-                continue;
+                _nextActiveForces.Add(newVector);
             }
-            _nextActiveForces.Add(_activeForces[i]);
         }
-        TransferNextForcesToActiveForces();
-    }
-    private void TransferNextForcesToActiveForces()
-    {
-        _activeForces.Clear();
-        foreach (var force in _nextActiveForces)
-        {
-            _activeForces.Add(force);
-        }
+
+        //make a new list in order to swap
+        var newList = _activeForces;
+        //update the active forces after calculations
+        _activeForces = _nextActiveForces;
+        //make the next active list point to the new list
+        _nextActiveForces = newList;
+        //clear the new list
         _nextActiveForces.Clear();
     }
-    private void CheckBorders()
+    //private void CheckBorders()
+    //{
+
+    //    if (this.transform.position.y >= _yTop)
+    //    {
+    //        _velocity *= new Vector2(1, -1);
+    //        transform.position = new Vector2(transform.position.x, _yTop);
+    //    }
+    //    if (this.transform.position.y <= _yBottom)
+    //    {
+    //        _velocity *= new Vector2(1, -1);
+    //        transform.position = new Vector2(transform.position.x, _yBottom);
+    //    }
+    //    if (this.transform.position.x >= _xRight)
+    //    {
+    //        _velocity *= new Vector2(-1, 1);
+    //        transform.position = new Vector2(_xRight, transform.position.y);
+
+    //    }
+    //    if (this.transform.position.x <= _xLeft)
+    //    {
+    //        _velocity *= new Vector2(-1, 1);
+    //        transform.position = new Vector2(_xLeft, transform.position.y);
+    //    }
+    //}
+    private void CheckMovement()
     {
-
-        if (this.transform.position.y >= _yTop)
+        var currentPos = (Vector2)transform.position;
+        if (_lastPosition != currentPos)
         {
-            _velocity *= new Vector2(1, -1);
-            transform.position = new Vector2(transform.position.x, _yTop);
-        }
-        if (this.transform.position.y <= _yBottom)
-        {
-            _velocity *= new Vector2(1, -1);
-            transform.position = new Vector2(transform.position.x, _yBottom);
-        }
-        if (this.transform.position.x >= _xRight)
-        {
-            _velocity *= new Vector2(-1, 1);
-            transform.position = new Vector2(_xRight, transform.position.y);
-
-        }
-        if (this.transform.position.x <= _xLeft)
-        {
-            _velocity *= new Vector2(-1, 1);
-            transform.position = new Vector2(_xLeft, transform.position.y);
+            //let The Collision Manager to know about this movement
+            OnPositionChanged?.Invoke(currentPos);
+            _lastPosition = currentPos;
         }
     }
     public void FixedUpdate()
@@ -134,6 +133,7 @@ public class EyalRigidbody2D : MonoBehaviour
         CalculateVelocity();
         transform.Translate(_velocity.x * Time.fixedDeltaTime / _mass, _velocity.y * Time.fixedDeltaTime / _mass, 0);
         ReduceForcesEffects();
-        CheckBorders();
+        //CheckBorders();
+        CheckMovement();
     }
 }
