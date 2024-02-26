@@ -955,9 +955,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidbody2D: {fileID: 1857315657}
-  _mouseDragStrength: 5
+  _mouseDragStrengthReduction: 3
   _camera: {fileID: 385396131}
   _lineRenderer: {fileID: 1620950020}
+  _zLocation: -1
   _startingPoint: {x: 0, y: 0, z: 0}
   _endPoint: {x: 0, y: 0, z: 0}
 --- !u!4 &1620950019
@@ -1021,13 +1022,13 @@ LineRenderer:
   - {x: 0, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 4
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.30041122
+        value: 1
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -1067,9 +1068,9 @@ LineRenderer:
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
     numCornerVertices: 0
-    numCapVertices: 0
+    numCapVertices: 90
     alignment: 0
-    textureMode: 0
+    textureMode: 1
     shadowBias: 0.5
     generateLightingData: 0
   m_UseWorldSpace: 1
@@ -1176,8 +1177,9 @@ MonoBehaviour:
   _hasGravity: 0
   _gravityForce: {x: 0, y: -10}
   _lastPosition: {x: 0, y: 0}
-  _accelerationForce: {x: 0, y: 0}
+  _totalAccelerationForce: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
+  _accelerationForces: []
   _activeForces: []
   _nextActiveForces: []
 --- !u!114 &1857315658

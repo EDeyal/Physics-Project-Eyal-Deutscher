@@ -13,8 +13,9 @@ public class EyalRigidbody2D : MonoBehaviour
     public event Action<Vector2> OnPositionChanged;
 
     [Header("Do not Change, read only fields")]
-    [SerializeField] Vector2 _accelerationForce;
+    [SerializeField] Vector2 _totalAccelerationForce;
     [SerializeField] Vector2 _velocity;
+    [SerializeField] List<Vector2> _accelerationForces;
     [SerializeField] List<Vector2> _activeForces;
     [SerializeField] List<Vector2> _nextActiveForces;
     EyalCollider _collider;
@@ -37,21 +38,39 @@ public class EyalRigidbody2D : MonoBehaviour
     {
         _lastPosition = transform.position;
     }
+
+    public void AddAccelerationForce(Vector2 accelerationForce)
+    { 
+        _accelerationForces.Add(accelerationForce);
+    }
+    public void RemoveAccelerationForce(Vector2 accelerationForce)
+    { 
+        _accelerationForces.Remove(accelerationForce);
+    }
+    public void CalculateCurrentAccelerationForceAddition()
+    {
+        foreach (var force in _accelerationForces)
+        {
+            _totalAccelerationForce += force * _mass * Time.fixedDeltaTime;
+        }
+        if (_hasGravity)
+        {
+            _totalAccelerationForce += _gravityForce * _mass * Time.fixedDeltaTime;
+        }
+    }
     public void AddForce(Vector2 force)
     {
         _activeForces.Add(force);
     }
+
     private void ResetForces()
     {
         _activeForces.Clear();
     }
     private void CalculateVelocity()
     {
-        if (_hasGravity)
-        {
-            _accelerationForce += _gravityForce * _mass * Time.fixedDeltaTime;
-        }
-        _velocity += _accelerationForce * Time.fixedDeltaTime;
+        CalculateCurrentAccelerationForceAddition();
+        _velocity += _totalAccelerationForce * Time.fixedDeltaTime;
         _velocity = UseDragEffectOnVector(_velocity);
     }
     private void CalculateAccelerationForce()

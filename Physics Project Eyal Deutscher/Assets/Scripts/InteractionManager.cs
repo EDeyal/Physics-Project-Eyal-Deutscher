@@ -6,12 +6,14 @@ using UnityEngine;
 public class InteractionManager : MonoBehaviour
 {
     [SerializeField] EyalRigidbody2D _rigidbody2D;
-    [SerializeField] float _mouseDragStrength = 1;
+    [SerializeField] float _mouseDragStrengthReduction = 1;
     [SerializeField] Camera _camera;
     [SerializeField] LineRenderer _lineRenderer;
+    [SerializeField] int _zLocation;
     [Header("Do not Change, read only fields")]
     [SerializeField] Vector3 _startingPoint;
     [SerializeField] Vector3 _endPoint;
+    
     bool _isDrawing;
     private void OnValidate()
     {
@@ -25,13 +27,15 @@ public class InteractionManager : MonoBehaviour
             _startingPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
             //Debug.Log("Mouse Clicked Down");
             _isDrawing = true;
-            _startingPoint.z = 1;
+            _startingPoint.z = _zLocation;
         }
         if (_isDrawing)
         {
             _lineRenderer.enabled = true;
             _lineRenderer.SetPosition(0, _startingPoint);
-            _lineRenderer.SetPosition(1, _camera.ScreenToWorldPoint(Input.mousePosition));
+            _endPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
+            _endPoint.z = _zLocation;
+            _lineRenderer.SetPosition(1, _endPoint);
         }
         else
         {
@@ -41,6 +45,7 @@ public class InteractionManager : MonoBehaviour
         {
             _endPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
             //Debug.Log("Mouse Clicked Up");
+            _endPoint.z = 1;
             CalculateDirection();
             _isDrawing=false;
         }
@@ -49,6 +54,6 @@ public class InteractionManager : MonoBehaviour
     { 
         Vector3 direction = _startingPoint - _endPoint;
         Debug.Log("Direction is: " +direction);
-        _rigidbody2D.AddForce(direction / _mouseDragStrength);
+        _rigidbody2D.AddForce(direction / _mouseDragStrengthReduction);
     }
 }
