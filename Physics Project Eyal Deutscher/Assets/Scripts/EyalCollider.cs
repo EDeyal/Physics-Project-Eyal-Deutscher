@@ -47,7 +47,7 @@ public class EyalCollider : MonoBehaviour
     {
         _rigidbody = rigidbody;
     }
-    private void OnEyalTriggerEnter(EyalCollider other)
+    public void OnEyalTriggerEnter(EyalCollider other)
     {
         if (_isTrigger)
         {
@@ -55,7 +55,7 @@ public class EyalCollider : MonoBehaviour
         }
     }
 
-    private void OnEyalCollisionEnter(EyalCollider other)
+    public void OnEyalCollisionEnter(EyalCollider other)
     {
         if (!_isTrigger)
         { 

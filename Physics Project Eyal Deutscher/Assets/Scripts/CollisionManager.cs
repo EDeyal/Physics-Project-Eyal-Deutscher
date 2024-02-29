@@ -4,7 +4,6 @@ using UnityEngine;
 public class CollisionManager : MonoSingleton<CollisionManager>
 {
     private List<EyalCollider> _colliders;
-
     public override void Awake()
     {
         base.Awake();
@@ -46,17 +45,37 @@ public class CollisionManager : MonoSingleton<CollisionManager>
                 {
                     continue;
                 }
-                if (AABBCollision(collider1, collider2,out hasCollided,out triggerOverlap))
+                if (AABBCollision(collider1, collider2, out hasCollided, out triggerOverlap))
                 {
                     if (hasCollided)
-                    { 
-                        ResolveCollisions(collider1,collider2,triggerOverlap);
+                    {
+                        ResolveCollisions(collider1, collider2, triggerOverlap);
                     }
                 }
             }
         }
     }
-    private bool AABBCollision(EyalCollider collider1, EyalCollider collider2,out bool hasCollided, out bool triggerOverlap)
+
+    public bool CheckObjectCollision(EyalCollider colliderToCheck)
+    {
+        bool triggerOverlap = false;
+        bool hasCollided = true;
+        foreach (var otherCollider in _colliders)
+        {
+            if (colliderToCheck != otherCollider)
+            {
+                if (AABBCollision(colliderToCheck, otherCollider, out hasCollided, out triggerOverlap))
+                {
+                    if (hasCollided && !triggerOverlap)
+                    { 
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    private bool AABBCollision(EyalCollider collider1, EyalCollider collider2, out bool hasCollided, out bool triggerOverlap)
     {
         triggerOverlap = false;
 
@@ -97,21 +116,64 @@ public class CollisionManager : MonoSingleton<CollisionManager>
         {
             if (isTrigger1 || isTrigger2)
             {
-                    triggerOverlap = true;
+                triggerOverlap = true;
             }
         }
         return _isOverlaping;
     }
-    private void ResolveCollisions(EyalCollider collider1, EyalCollider collider2,bool isTriggerCollision)
+    private void ResolveCollisions(EyalCollider collider1, EyalCollider collider2, bool isTriggerCollision)
     {
+        Vector2 collisionNormal = CalculateCollisionNormal(collider1.transform.position, collider2.transform.position);//will work only for the middle area of the object
         if (isTriggerCollision)
         {
             Debug.Log("Overlap Collision");
+            if (collider1.IsTrigger)
+            {
+                collider1.OnEyalTriggerEnter(collider2);
+            }
+            if (collider2.IsTrigger)
+            {
+                collider2.OnEyalTriggerEnter(collider1);
+            }
+
         }
         else
-        { 
-            Debug.Log("Collision");
+        {
+            collider2.OnEyalCollisionEnter(collider1);
+
+            TryResolveCollision(collider1, collisionNormal, collider2);
+            TryResolveCollision(collider2, -collisionNormal, collider1);//reverting collision normal for the second collider
+            //Debug.Log("Collision");
         }
-        //resolve collision logic
+    }
+    private void TryResolveCollision(EyalCollider collider, Vector2 collisionNormal,EyalCollider otherCollider)
+    {
+        if (collider.Rigidbody)
+        {
+            if (collider.Rigidbody.IsMoveable)
+            {
+                if (!collider.Rigidbody.IsResolvingCollision)
+                {
+                    collider.OnEyalCollisionEnter(otherCollider);
+                    Bounce(collider, collisionNormal);
+                    Debug.Log("Collision Normal is: " + collisionNormal);
+                }
+            }
+        }
+    }
+    private void Bounce(EyalCollider collider, Vector2 collisionNormal)
+    {
+        float relativeVelocity = Vector2.Dot(collider.Rigidbody.Velocity, collisionNormal);
+        float BounceStrength = (-(collider.Rigidbody.Bounceiness) * relativeVelocity / collider.Rigidbody.Mass);//bounciness equasion, basically redirects the velocity to the new normalized vector
+        collider.Rigidbody.StopRigidbody();
+        collider.Rigidbody.AddForce(collisionNormal * BounceStrength);
+    }
+
+    private Vector2 CalculateCollisionNormal(Vector2 posA, Vector2 posB)
+    {
+        Vector2 direction;
+        direction = posA - posB;
+        direction.Normalize();
+        return direction;
     }
 }

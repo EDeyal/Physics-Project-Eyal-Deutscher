@@ -53,7 +53,7 @@ public class InteractionManager : MonoBehaviour
     private void CalculateDirection()
     { 
         Vector3 direction = _startingPoint - _endPoint;
-        Debug.Log("Direction is: " +direction);
+        //Debug.Log("Direction is: " +direction);
         _rigidbody2D.AddForce(direction / _mouseDragStrengthReduction);
     }
 }

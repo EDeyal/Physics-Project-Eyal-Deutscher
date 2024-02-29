@@ -7,10 +7,13 @@ public class EyalRigidbody2D : MonoBehaviour
 {
     [SerializeField] float _mass;
     [SerializeField] float _drag;
+    [SerializeField] float _bounciness;
     [SerializeField] bool _hasGravity;
+    [SerializeField] bool _isMoveable;
     [SerializeField] Vector2 _gravityForce;
     [SerializeField] Vector2 _lastPosition;
     public event Action<Vector2> OnPositionChanged;
+
 
     [Header("Do not Change, read only fields")]
     [SerializeField] Vector2 _totalAccelerationForce;
@@ -18,9 +21,15 @@ public class EyalRigidbody2D : MonoBehaviour
     [SerializeField] List<Vector2> _accelerationForces;
     [SerializeField] List<Vector2> _activeForces;
     [SerializeField] List<Vector2> _nextActiveForces;
+    [SerializeField] bool _isResolvingCollision = false;
     EyalCollider _collider;
 
     public EyalCollider Collider => _collider;
+    public float Bounceiness => _bounciness;
+    public float Mass => _mass;
+    public Vector2 Velocity => _velocity;
+    public bool IsMoveable => _isMoveable;
+    public bool IsResolvingCollision => _isResolvingCollision;
 
     private void Awake()
     {
@@ -125,6 +134,20 @@ public class EyalRigidbody2D : MonoBehaviour
             _lastPosition = currentPos;
         }
     }
+    public void StopRigidbody()
+    {
+            _velocity = Vector2.zero;
+        ResetForces();
+        _isResolvingCollision = true;
+    }
+    private void TryResolveCollision()
+    {
+        if (!CollisionManager.Instance.CheckObjectCollision(Collider))
+        {
+            _isResolvingCollision = false ;
+        }
+
+    }
     public void FixedUpdate()
     {
         CalculateAccelerationForce();
@@ -132,5 +155,10 @@ public class EyalRigidbody2D : MonoBehaviour
         transform.Translate(_velocity.x * Time.fixedDeltaTime / _mass, _velocity.y * Time.fixedDeltaTime / _mass, 0);
         ReduceForcesEffects();
         CheckMovement();
+
+        if (_isResolvingCollision)
+        {
+            TryResolveCollision();
+        }
     }
 }
