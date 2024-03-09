@@ -4,10 +4,12 @@ public class EyalCollider : MonoBehaviour
 {
     [SerializeField] bool _isTrigger;
     EyalRigidbody2D _rigidbody;
+    CollisionDirectionType _collisionResolveDirection = 0;
 
     public EyalRigidbody2D Rigidbody => _rigidbody;
     public bool IsTrigger => _isTrigger;
     Renderer _renderer;
+    public CollisionDirectionType CollisionResolveDirection {get => _collisionResolveDirection; set => _collisionResolveDirection = value;}
 
     public Bounds Bounds
     {

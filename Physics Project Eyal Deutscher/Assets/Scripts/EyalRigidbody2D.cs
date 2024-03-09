@@ -136,7 +136,7 @@ public class EyalRigidbody2D : MonoBehaviour
     }
     public void StopRigidbody()
     {
-            _velocity = Vector2.zero;
+        _velocity = Vector2.zero;
         ResetForces();
         _isResolvingCollision = true;
     }
@@ -145,6 +145,7 @@ public class EyalRigidbody2D : MonoBehaviour
         if (!CollisionManager.Instance.CheckObjectCollision(Collider))
         {
             _isResolvingCollision = false ;
+            Collider.CollisionResolveDirection = 0;//none
         }
 
     }
