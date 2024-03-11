@@ -84,6 +84,7 @@ public class EyalRigidbody2D : MonoBehaviour
     }
     private void CalculateAccelerationForce()
     {
+        _velocity = Vector2.zero;
         foreach (var force in _activeForces)
         {
             _velocity += force * Time.fixedDeltaTime;
@@ -136,7 +137,6 @@ public class EyalRigidbody2D : MonoBehaviour
     }
     public void StopRigidbody()
     {
-        _velocity = Vector2.zero;
         ResetForces();
         _isResolvingCollision = true;
     }

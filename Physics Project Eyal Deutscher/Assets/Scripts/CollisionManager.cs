@@ -265,7 +265,7 @@ public class CollisionManager : MonoSingleton<CollisionManager>
         float BounceStrength = Mathf.Abs(collider.Rigidbody.Bounceiness / collider.Rigidbody.Mass);//bounciness equasion, basically redirects the velocity to the new normalized vector
         Debug.Log("Velocity " + collider.Rigidbody.Velocity);
         collider.Rigidbody.StopRigidbody();
-        Vector2 forceToAdd = resolveVector * BounceStrength;
+        Vector2 forceToAdd = resolveVector * BounceStrength /Time.fixedDeltaTime;//multiply force by fixed delta time
         Debug.Log("Added Force " + forceToAdd);
         collider.Rigidbody.AddForce(forceToAdd);
     }

@@ -6,7 +6,7 @@ using UnityEngine;
 public class InteractionManager : MonoBehaviour
 {
     [SerializeField] EyalRigidbody2D _rigidbody2D;
-    [SerializeField] float _mouseDragStrengthReduction = 1;
+    [SerializeField,Range(1,100)] float _mouseDragStrengthMultiplication = 1;
     [SerializeField] Camera _camera;
     [SerializeField] LineRenderer _lineRenderer;
     [SerializeField] int _zLocation;
@@ -54,6 +54,6 @@ public class InteractionManager : MonoBehaviour
     { 
         Vector3 direction = _startingPoint - _endPoint;
         //Debug.Log("Direction is: " +direction);
-        _rigidbody2D.AddForce(direction / _mouseDragStrengthReduction);
+        _rigidbody2D.AddForce(direction * _mouseDragStrengthMultiplication);
     }
 }
