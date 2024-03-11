@@ -2366,7 +2366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidbody2D: {fileID: 1857315657}
-  _mouseDragStrengthMultiplication: 10
+  _mouseDragStrengthMultiplication: 3
   _camera: {fileID: 385396131}
   _lineRenderer: {fileID: 1620950020}
   _zLocation: -1
@@ -2972,10 +2972,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mass: 1
-  _drag: 10
+  _drag: 1
   _bounciness: 1
-  _hasGravity: 0
+  _hasGravity: 1
   _isMoveable: 1
+  _isGrounded: 0
   _gravityForce: {x: 0, y: -10}
   _lastPosition: {x: 0, y: 0}
   _totalAccelerationForce: {x: 0, y: 0}

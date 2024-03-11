@@ -10,6 +10,7 @@ public class EyalRigidbody2D : MonoBehaviour
     [SerializeField] float _bounciness;
     [SerializeField] bool _hasGravity;
     [SerializeField] bool _isMoveable;
+    [SerializeField] bool _isGrounded;
     [SerializeField] Vector2 _gravityForce;
     [SerializeField] Vector2 _lastPosition;
     public event Action<Vector2> OnPositionChanged;
@@ -30,6 +31,7 @@ public class EyalRigidbody2D : MonoBehaviour
     public Vector2 Velocity => _velocity;
     public bool IsMoveable => _isMoveable;
     public bool IsResolvingCollision => _isResolvingCollision;
+    public bool IsGrounded { get => _isGrounded; set => _isGrounded = value; }
 
     private void Awake()
     {
@@ -46,6 +48,10 @@ public class EyalRigidbody2D : MonoBehaviour
     private void Start()
     {
         _lastPosition = transform.position;
+         if (_hasGravity)
+        {
+           AddAccelerationForce(_gravityForce);
+        }
     }
 
     public void AddAccelerationForce(Vector2 accelerationForce)
@@ -58,13 +64,10 @@ public class EyalRigidbody2D : MonoBehaviour
     }
     public void CalculateCurrentAccelerationForceAddition()
     {
+        _totalAccelerationForce = Vector2.zero;
         foreach (var force in _accelerationForces)
         {
             _totalAccelerationForce += force * _mass * Time.fixedDeltaTime;
-        }
-        if (_hasGravity)
-        {
-            _totalAccelerationForce += _gravityForce * _mass * Time.fixedDeltaTime;
         }
     }
     public void AddForce(Vector2 force)
@@ -79,12 +82,12 @@ public class EyalRigidbody2D : MonoBehaviour
     private void CalculateVelocity()
     {
         CalculateCurrentAccelerationForceAddition();
-        _velocity += _totalAccelerationForce * Time.fixedDeltaTime;
+        _velocity += _totalAccelerationForce;
         _velocity = UseDragEffectOnVector(_velocity);
     }
     private void CalculateAccelerationForce()
     {
-        _velocity = Vector2.zero;
+        //_velocity = Vector2.zero;
         foreach (var force in _activeForces)
         {
             _velocity += force * Time.fixedDeltaTime;
@@ -135,10 +138,12 @@ public class EyalRigidbody2D : MonoBehaviour
             _lastPosition = currentPos;
         }
     }
-    public void StopRigidbody()
+    public void BounceRigidbody(Vector2 resolveVector)
     {
+        _velocity = resolveVector;
         ResetForces();
         _isResolvingCollision = true;
+        _isGrounded = false;
     }
     private void TryResolveCollision()
     {
