@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(EyalCollider))]
 public class EyalRigidbody2D : MonoBehaviour
 {
+    static float _dragOffset = 0.01f;
     [SerializeField] float _mass;
-    [SerializeField] float _drag;
+    [SerializeField,Range(0,0.1f)] float _drag;
     [SerializeField] float _bounciness;
     [SerializeField] bool _hasGravity;
     [SerializeField] bool _isMoveable;
@@ -22,16 +24,15 @@ public class EyalRigidbody2D : MonoBehaviour
     [SerializeField] List<Vector2> _accelerationForces;
     [SerializeField] List<Vector2> _activeForces;
     [SerializeField] List<Vector2> _nextActiveForces;
-    [SerializeField] bool _isResolvingCollision = false;
     EyalCollider _collider;
-
+    [SerializeField] List<CollisionData> _collisionData;
     public EyalCollider Collider => _collider;
     public float Bounceiness => _bounciness;
     public float Mass => _mass;
     public Vector2 Velocity => _velocity;
     public bool IsMoveable => _isMoveable;
-    public bool IsResolvingCollision => _isResolvingCollision;
     public bool IsGrounded { get => _isGrounded; set => _isGrounded = value; }
+    public List<CollisionData> CollisionsData => _collisionData;
 
     private void Awake()
     {
@@ -48,10 +49,6 @@ public class EyalRigidbody2D : MonoBehaviour
     private void Start()
     {
         _lastPosition = transform.position;
-         if (_hasGravity)
-        {
-           AddAccelerationForce(_gravityForce);
-        }
     }
 
     public void AddAccelerationForce(Vector2 accelerationForce)
@@ -65,9 +62,29 @@ public class EyalRigidbody2D : MonoBehaviour
     public void CalculateCurrentAccelerationForceAddition()
     {
         _totalAccelerationForce = Vector2.zero;
+
+        if (_hasGravity)
+        {
+            if(!_accelerationForces.Contains(_gravityForce * Mass))
+                AddAccelerationForce(_gravityForce*Mass);
+
+            if (_isGrounded)
+            {
+                //if does not have the opposite from gravity add counter for the gravity
+                if (!_accelerationForces.Contains(-_gravityForce*Mass))
+                    AddAccelerationForce(-_gravityForce*Mass);
+            }
+            else
+            {
+                //if is not colliding with the ground remove the counter force
+                if(_accelerationForces.Contains(-_gravityForce * Mass))
+                    RemoveAccelerationForce(-_gravityForce * Mass);
+            }
+        }
+
         foreach (var force in _accelerationForces)
         {
-            _totalAccelerationForce += force * _mass * Time.fixedDeltaTime;
+            _totalAccelerationForce += force / _mass * Time.fixedDeltaTime;
         }
     }
     public void AddForce(Vector2 force)
@@ -81,52 +98,42 @@ public class EyalRigidbody2D : MonoBehaviour
     }
     private void CalculateVelocity()
     {
+        _velocity += CalculateVelocityByForces();
         CalculateCurrentAccelerationForceAddition();
         _velocity += _totalAccelerationForce;
         _velocity = UseDragEffectOnVector(_velocity);
     }
-    private void CalculateAccelerationForce()
+    private Vector2 CalculateVelocityByForces()
     {
-        //_velocity = Vector2.zero;
+        Vector2 velocityAddition = Vector2.zero;
         foreach (var force in _activeForces)
         {
-            _velocity += force * Time.fixedDeltaTime;
+            velocityAddition += force / _mass * Time.fixedDeltaTime;
         }
+        _activeForces.Clear();
+        return velocityAddition;
     }
     private Vector2 UseDragEffectOnVector(Vector2 vector)
     {
-        //drag for the current frame
-        float dragDeltaTime = _drag * Time.fixedDeltaTime;
-
-        //if the x vector is larger then the drag, reduce the vector length, if it is smaller, make it 0.
-        float newX = Mathf.Abs(vector.x) > dragDeltaTime ? vector.x - Mathf.Sign(vector.x) * dragDeltaTime : 0f;
-
-        //if the y vector is larger then the drag, reduce the vector length, if it is smaller, make it 0.
-        float newY = Mathf.Abs(vector.y) > dragDeltaTime ? vector.y - Mathf.Sign(vector.y) * dragDeltaTime : 0f;
-
-        //return a new vector
-        return new Vector2(newX, newY);
-    }
-    private void ReduceForcesEffects()
-    {
-        foreach (var force in _activeForces)
+        //reduce vector length by drag;
+        vector *= (1-_drag);
+        //if the x vector is smaller then the drag delta, make it 0.
+        float newX = 0f;
+        if (Mathf.Abs(vector.x) > _dragOffset)
         {
-            Vector2 newVector = UseDragEffectOnVector(force);
-            //if a vector is 0 it does not effect the equasion and need to be removed.s
-            if (newVector != Vector2.zero)
-            {
-                _nextActiveForces.Add(newVector);
-            }
+            newX = vector.x;
+        }
+        //if the y vector is smaller then the drag delta, make it 0.
+        float newY = 0f;
+        if (Mathf.Abs(vector.y) > _dragOffset)
+        {
+            newY = vector.y;
         }
 
-        //make a new list in order to swap
-        var newList = _activeForces;
-        //update the active forces after calculations
-        _activeForces = _nextActiveForces;
-        //make the next active list point to the new list
-        _nextActiveForces = newList;
-        //clear the new list
-        _nextActiveForces.Clear();
+
+        vector = new Vector2(newX, newY);
+
+        return vector;
     }
     private void CheckMovement()
     {
@@ -138,31 +145,74 @@ public class EyalRigidbody2D : MonoBehaviour
             _lastPosition = currentPos;
         }
     }
+    #region Collisions
+    private void TryResolveCollision()
+    {
+        List<CollisionData> existingCollisions = new List<CollisionData>();
+        foreach (var collisionData in _collisionData)
+        {
+            if (CollisionManager.Instance.CheckObjectCollision(_collider, collisionData.Collider))
+            {
+                existingCollisions.Add(collisionData);
+            }
+        }
+        _collisionData = existingCollisions;
+
+        //check is grounded
+        _isGrounded = false;
+        foreach (var collisionData in _collisionData)
+        { 
+            if (collisionData.DirectionType == CollisionDirectionType.BottomCollision)
+            {
+                _isGrounded = true;
+            }
+        }
+    }
     public void BounceRigidbody(Vector2 resolveVector)
     {
         _velocity = resolveVector;
         ResetForces();
-        _isResolvingCollision = true;
-        _isGrounded = false;
     }
-    private void TryResolveCollision()
+    public bool IsResolvingCollision(EyalCollider otherCollider)
     {
-        if (!CollisionManager.Instance.CheckObjectCollision(Collider))
+        foreach (var collisionData in _collisionData)
         {
-            _isResolvingCollision = false ;
-            Collider.CollisionResolveDirection = 0;//none
+            if (collisionData.Collider == otherCollider)
+            {
+                return true;
+            }
         }
-
+        return false;
     }
+    public void AddCollisionData(CollisionData collisionData)
+    {
+        if (_collisionData.Contains(collisionData))
+        {
+            return;
+        }
+        _collisionData.Add(collisionData);
+    }
+    public void RemoveCollidingCollider(CollisionData collisionData)
+    {
+        if (!_collisionData.Contains(collisionData))
+        {
+            return;
+        }
+        _collisionData.Remove(collisionData);
+    }
+
+    #endregion
     public void FixedUpdate()
     {
-        CalculateAccelerationForce();
+        //calculate forces
         CalculateVelocity();
-        transform.Translate(_velocity.x * Time.fixedDeltaTime / _mass, _velocity.y * Time.fixedDeltaTime / _mass, 0);
-        ReduceForcesEffects();
-        CheckMovement();
 
-        if (_isResolvingCollision)
+        //move this object
+        transform.Translate(_velocity.x * Time.fixedDeltaTime, _velocity.y * Time.fixedDeltaTime, 0);
+        //check if this object moved this frame
+        CheckMovement();
+        //solve collisions if any exists
+        if (_collisionData.Count>0)
         {
             TryResolveCollision();
         }

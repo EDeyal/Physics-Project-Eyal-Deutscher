@@ -9,13 +9,28 @@ public enum CollisionDirectionType
     TopCollision = 3,
     BottomCollision = 4
 }
+struct ResolveCollisionData
+{
+    public ResolveCollisionData(EyalCollider mainCollider,EyalCollider otherCollider,Vector2 resolveVector)
+    {
+        MainCollider = mainCollider;
+        OtherCollider = otherCollider;
+        ResolveVector = resolveVector;
+    }
+    public EyalCollider MainCollider;
+    public EyalCollider OtherCollider;
+    public Vector2 ResolveVector;
+}
 public class CollisionManager : MonoSingleton<CollisionManager>
 {
     private List<EyalCollider> _colliders;
+    private List<ResolveCollisionData> _collisionsData;
+
     public override void Awake()
     {
         base.Awake();
         _colliders = new List<EyalCollider>();
+        _collisionsData = new List<ResolveCollisionData>();
     }
     public void RigisterCollider(EyalCollider collider)
     {
@@ -33,6 +48,7 @@ public class CollisionManager : MonoSingleton<CollisionManager>
     private void FixedUpdate()
     {
         DetectCollisions();
+        ResolveCollisionData();
     }
     private void DetectCollisions()
     {
@@ -57,28 +73,23 @@ public class CollisionManager : MonoSingleton<CollisionManager>
                 {
                     if (hasCollided)
                     {
-                        ResolveCollisions(collider1, collider2, triggerOverlap);
+                        AssignCollisionsData(collider1, collider2, triggerOverlap);
                     }
                 }
             }
         }
     }
 
-    public bool CheckObjectCollision(EyalCollider colliderToCheck)
+    public bool CheckObjectCollision(EyalCollider collider, EyalCollider otherCollider)
     {
         bool triggerOverlap = false;
         bool hasCollided = true;
-        foreach (var otherCollider in _colliders)
+
+        if (AABBCollision(collider, otherCollider, out hasCollided, out triggerOverlap))
         {
-            if (colliderToCheck != otherCollider)
+            if (hasCollided && !triggerOverlap)
             {
-                if (AABBCollision(colliderToCheck, otherCollider, out hasCollided, out triggerOverlap))
-                {
-                    if (hasCollided && !triggerOverlap)
-                    {
-                        return true;
-                    }
-                }
+                return true;
             }
         }
         return false;
@@ -169,6 +180,7 @@ public class CollisionManager : MonoSingleton<CollisionManager>
         {
             //top bound hit
             directionResolveType = CollisionDirectionType.TopCollision;
+
         }
         else if (shortestDistance == colliderBottomDistance)
         {
@@ -191,7 +203,7 @@ public class CollisionManager : MonoSingleton<CollisionManager>
         }
         return directionResolveType;
     }
-    private void ResolveCollisions(EyalCollider collider1, EyalCollider collider2, bool isTriggerCollision)
+    private void AssignCollisionsData(EyalCollider collider1, EyalCollider collider2, bool isTriggerCollision)
     {
         //Vector2 collisionNormal = CalculateCollisionNormal(collider1.transform.position, collider2.transform.position);//will work only for the middle area of the object
         if (isTriggerCollision)
@@ -201,59 +213,82 @@ public class CollisionManager : MonoSingleton<CollisionManager>
             {
                 collider1.OnEyalTriggerEnter(collider2);
             }
-            if (collider2.IsTrigger)
-            {
-                collider2.OnEyalTriggerEnter(collider1);
-            }
-
         }
         else
         {
-            collider2.OnEyalCollisionEnter(collider1);
-            Vector2 resolveVector = collider1.Rigidbody.Velocity;
-
-            switch (collider1.CollisionResolveDirection)
+            Vector2 resolveVector = Vector2.zero;
+            if (collider2.Rigidbody) //2 bodies collide
             {
-                case CollisionDirectionType.None:
-                    //probably an error
-                    //Debug.LogError("Error?");
-                    break;
-                case CollisionDirectionType.RightCollision:
-                    //Debug.Log("right collision");
-                    //revert x axis
-                    resolveVector.x *= -1;
-                    break;
-                case CollisionDirectionType.LeftCollision:
-                    //Debug.Log("left collision");
-                    //revert x axis
-                    resolveVector.x *= -1;
-                    break;
-                case CollisionDirectionType.TopCollision:
-                    //Debug.Log("top collision");
-                    //revert y axis
-                    resolveVector.y *= -1;
-                    break;
-                case CollisionDirectionType.BottomCollision:
-                    //Debug.Log("bottom collision");
-                    //revert y axis
-                    collider1.Rigidbody.IsGrounded = true;
-                    resolveVector.y *= -1;
-                    break;
-                default:
-                    break;
+                float mass1 = collider1.Rigidbody.Mass;
+                float mass2 = collider2.Rigidbody.Mass;
+
+                //v1' = (2m2/m1+m2)*v2 + ((m1-m2)/(m1+m2)*v1)
+                resolveVector = (2 * mass2 / (mass1 + mass2)) * collider2.Rigidbody.Velocity;
+                resolveVector += (mass1 - mass2) / (mass1 + mass2) * collider1.Rigidbody.Velocity;
+
+                //resolveVector += collider2.Rigidbody.Velocity;
             }
-            TryResolveCollision(collider1, resolveVector, collider2);
+            else //hit a wall
+            {
+                resolveVector = collider1.Rigidbody.Velocity;
+                switch (collider1.CollisionResolveDirection)
+                {
+                    case CollisionDirectionType.None:
+                        //probably an error
+                        //Debug.LogError("Error?");
+                        break;
+                    case CollisionDirectionType.RightCollision:
+                        //Debug.Log("right collision");
+                        //revert x axis
+                        resolveVector.x *= -1;
+                        break;
+                    case CollisionDirectionType.LeftCollision:
+                        //Debug.Log("left collision");
+                        //revert x axis
+                        resolveVector.x *= -1;
+                        break;
+                    case CollisionDirectionType.TopCollision:
+                        //Debug.Log("top collision");
+                        //revert y axis
+                        resolveVector.y *= -1;
+                        break;
+                    case CollisionDirectionType.BottomCollision:
+                        //Debug.Log("bottom collision");
+                        //revert y axis
+                        resolveVector.y *= -1;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+
+
+            _collisionsData.Add(new ResolveCollisionData(collider1, collider2, resolveVector));
             //Debug.Log("Collision");
         }
     }
-    private void TryResolveCollision(EyalCollider collider, Vector2 resolveVector, EyalCollider otherCollider)
+    private void ResolveCollisionData()
+    {
+        foreach (var data in _collisionsData)
+        {
+            TryResolveCollision(data.MainCollider, data.OtherCollider, data.ResolveVector);
+        }
+        _collisionsData.Clear();
+    }
+    private void TryResolveCollision(EyalCollider collider, EyalCollider otherCollider, Vector2 resolveVector)
     {
         if (collider.Rigidbody)
         {
             if (collider.Rigidbody.IsMoveable)
             {
-                if (!collider.Rigidbody.IsResolvingCollision)
+                if (!collider.Rigidbody.IsResolvingCollision(otherCollider))
                 {
+                    if (collider.Rigidbody != null)
+                    {
+                        collider.Rigidbody.AddCollisionData(new CollisionData(otherCollider, collider.CollisionResolveDirection));
+                    }
+                    Debug.Log(collider.Rigidbody.gameObject.name + ": is colliding");
                     collider.OnEyalCollisionEnter(otherCollider);
                     Bounce(collider, resolveVector);
                     //Debug.Log("Collision Normal is: " + collisionNormal);
@@ -264,11 +299,11 @@ public class CollisionManager : MonoSingleton<CollisionManager>
     private void Bounce(EyalCollider collider, Vector2 resolveVector)
     {
         float BounceStrength = Mathf.Abs(collider.Rigidbody.Bounceiness / collider.Rigidbody.Mass);//bounciness equasion, basically redirects the velocity to the new normalized vector
-        Debug.Log("Velocity " + collider.Rigidbody.Velocity);
-        collider.Rigidbody.BounceRigidbody(resolveVector*BounceStrength);
-//        Vector2 forceToAdd = resolveVector * BounceStrength;//multiply force by fixed delta time
-  //      Debug.Log("Added Force " + forceToAdd);
-    //    collider.Rigidbody.AddForce(forceToAdd);
+        //Debug.Log("Velocity " + collider.Rigidbody.Velocity);
+        collider.Rigidbody.BounceRigidbody(resolveVector * BounceStrength);
+        //        Vector2 forceToAdd = resolveVector * BounceStrength;//multiply force by fixed delta time
+        //      Debug.Log("Added Force " + forceToAdd);
+        //    collider.Rigidbody.AddForce(forceToAdd);
     }
 
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 public class InteractionManager : MonoBehaviour
 {
     [SerializeField] EyalRigidbody2D _rigidbody2D;
-    [SerializeField,Range(1,100)] float _mouseDragStrengthMultiplication = 1;
+    [SerializeField,Range(1,1000)] float _mouseDragStrengthMultiplication = 1;
     [SerializeField] Camera _camera;
     [SerializeField] LineRenderer _lineRenderer;
     [SerializeField] int _zLocation;
