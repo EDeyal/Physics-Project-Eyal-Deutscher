@@ -208,7 +208,14 @@ public class EyalRigidbody2D : MonoBehaviour
         CalculateVelocity();
 
         //move this object
-        transform.Translate(_velocity.x * Time.fixedDeltaTime, _velocity.y * Time.fixedDeltaTime, 0);
+        if (_isGrounded && _velocity.y < 0)
+        {
+            transform.Translate(_velocity.x * Time.fixedDeltaTime, 0, 0);
+        }
+        else
+        { 
+            transform.Translate(_velocity.x * Time.fixedDeltaTime, _velocity.y * Time.fixedDeltaTime, 0);
+        }
         //check if this object moved this frame
         CheckMovement();
         //solve collisions if any exists
