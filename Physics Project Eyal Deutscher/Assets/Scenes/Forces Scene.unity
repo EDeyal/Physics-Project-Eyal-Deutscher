@@ -883,7 +883,7 @@ MonoBehaviour:
   _isAttachedToRope: 1
   _ropeAnchorPos: {x: 0, y: 11}
   _ropeLength: 7
-  _ropeStiffness: 10
+  _ropeStiffness: 2
   _totalAccelerationForce: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
   _accelerationForces: []
@@ -1310,7 +1310,7 @@ MonoBehaviour:
   _lastPosition: {x: 0, y: 0}
   _isAttachedToRope: 0
   _ropeAnchorPos: {x: 0, y: 11}
-  _ropeLength: 10
+  _ropeLength: 100
   _ropeStiffness: 1
   _totalAccelerationForce: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
