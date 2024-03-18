@@ -873,13 +873,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mass: 1
-  _drag: 0.01
+  _drag: 0.001
   _bounciness: 0.5
   _hasGravity: 1
   _isMoveable: 1
   _isGrounded: 0
   _gravityForce: {x: 0, y: -10}
   _lastPosition: {x: 0, y: 0}
+  _isAttachedToRope: 1
+  _ropeAnchorPos: {x: 0, y: 11}
+  _ropeLength: 7
+  _ropeStiffness: 10
   _totalAccelerationForce: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
   _accelerationForces: []
@@ -1304,6 +1308,10 @@ MonoBehaviour:
   _isGrounded: 0
   _gravityForce: {x: 0, y: -10}
   _lastPosition: {x: 0, y: 0}
+  _isAttachedToRope: 0
+  _ropeAnchorPos: {x: 0, y: 11}
+  _ropeLength: 10
+  _ropeStiffness: 1
   _totalAccelerationForce: {x: 0, y: 0}
   _velocity: {x: 0, y: 0}
   _accelerationForces: []

@@ -17,6 +17,11 @@ public class EyalRigidbody2D : MonoBehaviour
     [SerializeField] Vector2 _lastPosition;
     public event Action<Vector2> OnPositionChanged;
 
+    [Space,Header("Rope")]
+    [SerializeField] bool _isAttachedToRope = false;
+    [SerializeField] Vector2 _ropeAnchorPos = Vector2.zero;
+    [SerializeField] float _ropeLength;
+    [SerializeField] float _ropeStiffness;
 
     [Header("Do not Change, read only fields")]
     [SerializeField] Vector2 _totalAccelerationForce;
@@ -98,6 +103,14 @@ public class EyalRigidbody2D : MonoBehaviour
     }
     private void CalculateVelocity()
     {
+
+        if (_isAttachedToRope)
+        {
+            Vector2 ropeForce = CalculatioRopeForce();
+
+            AddForce(ropeForce);
+        }
+
         _velocity += CalculateVelocityByForces();
         CalculateCurrentAccelerationForceAddition();
         _velocity += _totalAccelerationForce;
@@ -202,6 +215,62 @@ public class EyalRigidbody2D : MonoBehaviour
     }
 
     #endregion
+
+    #region RopeCalculations
+    public void AttachToRope(Vector2 attachmentPoint, float ropeLength, float stiffness)
+    { 
+        _isAttachedToRope = true;
+        _ropeAnchorPos = attachmentPoint;
+        _ropeLength = ropeLength;
+        _ropeStiffness = stiffness;
+    }
+    public void DetachFromRope()
+    { 
+        _isAttachedToRope = false;
+        _ropeAnchorPos = Vector2.zero;
+        _ropeLength = 0;
+        _ropeStiffness = 0;
+    }
+
+    private float CalculateTensionMagnitude(float CurrentDistance, float ropeLength, float stiffness)
+    {
+        float extention = CurrentDistance - ropeLength;
+
+        //ensure that the extention is absolute
+        extention = Mathf.Abs(extention);
+
+        //
+        float tensionMagnutude = stiffness * extention;
+
+        return tensionMagnutude;
+    }
+
+    private Vector2 CalculatioRopeForce()
+    {
+        //calculate direction to anchor point
+        Vector2 attachmentVector = _ropeAnchorPos - (Vector2)transform.position;
+
+        //calculate distance
+        float distanceFromAnchor = attachmentVector.magnitude;
+
+        if (distanceFromAnchor < _ropeLength)
+        {
+            attachmentVector *= -1;
+
+            //rope is loose and should not effect anything.
+            //return Vector2.zero;
+        }
+        float tensionMagnitude = CalculateTensionMagnitude(distanceFromAnchor, _ropeLength, _ropeStiffness);
+
+        attachmentVector.Normalize();
+
+
+        Vector2 tensionForce = attachmentVector * tensionMagnitude;
+
+        return tensionForce;
+    }
+    #endregion
+
     public void FixedUpdate()
     {
         //calculate forces
