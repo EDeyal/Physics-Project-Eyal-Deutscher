@@ -22,8 +22,11 @@ public class InteractionManager : MonoBehaviour
     }
     private void Update()
     {
+
         if (Input.GetMouseButtonDown(0))
         {
+            if (_rigidbody2D == null)
+                return;
             _startingPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
             //Debug.Log("Mouse Clicked Down");
             _isDrawing = true;
@@ -43,6 +46,8 @@ public class InteractionManager : MonoBehaviour
         }
         if (Input.GetMouseButtonUp(0))
         {
+            if (_rigidbody2D == null)
+                return;
             _endPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
             //Debug.Log("Mouse Clicked Up");
             _endPoint.z = 1;
@@ -54,6 +59,9 @@ public class InteractionManager : MonoBehaviour
     { 
         Vector3 direction = _startingPoint - _endPoint;
         //Debug.Log("Direction is: " +direction);
+
         _rigidbody2D.AddForce(direction * _mouseDragStrengthMultiplication);
+
+        _rigidbody2D = null;
     }
 }
