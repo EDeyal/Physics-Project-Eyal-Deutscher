@@ -20,6 +20,19 @@ public class InteractionManager : MonoBehaviour
         _camera = Camera.main;
         _lineRenderer = GetComponent<LineRenderer>();
     }
+    public void Awake()
+    {
+        GameManager.Instance.SetInteractionManager(this);
+    }
+    public void SetObjectToShoot(GameObject firedObject)
+    {
+        _rigidbody2D = firedObject.GetComponent<EyalRigidbody2D>();
+        if (_rigidbody2D == null)
+        {
+            Debug.LogWarning("Missing Rigidbody");
+        }
+    }
+
     private void Update()
     {
 
@@ -56,12 +69,19 @@ public class InteractionManager : MonoBehaviour
         }
     }
     private void CalculateDirection()
-    { 
+    {
         Vector3 direction = _startingPoint - _endPoint;
         //Debug.Log("Direction is: " +direction);
 
         _rigidbody2D.AddForce(direction * _mouseDragStrengthMultiplication);
+        StartCoroutine(LoadNextShotInXSeconds());
+    }
 
+    public IEnumerator LoadNextShotInXSeconds()
+    { 
         _rigidbody2D = null;
+        yield return new WaitForSeconds(5);
+        //Debug.Log("LoadNextShot");
+        GameManager.Instance.LoadNextShot();
     }
 }

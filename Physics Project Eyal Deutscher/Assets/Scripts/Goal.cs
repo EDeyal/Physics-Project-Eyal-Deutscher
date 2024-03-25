@@ -15,7 +15,7 @@ public class Goal : MonoBehaviour
         if (collider.gameObject.tag == "Box")
         {
             Debug.Log("Victory");
-            LevelManager.Instance.GoToNextLevel();
+            GameManager.Instance.LevelCompleted();
         }
     }
 }
