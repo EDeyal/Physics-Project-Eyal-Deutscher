@@ -45,8 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c5bdb94bdb6818489742f9f34c9a792, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shotsForThisLevel: 3
+  _shotsForThisLevel: 100
   _levels:
+  - {fileID: 102900000, guid: 81aa96e03c4afa9438a3118e7e0f7ab7, type: 3}
   - {fileID: 102900000, guid: 06c6fb85e68616b46a9f1f3b7fe1ca22, type: 3}
   - {fileID: 102900000, guid: 845eabcaaf7ca1a48b59c06317e5a443, type: 3}
   _spawnPosition: {fileID: 3224789152758086171}

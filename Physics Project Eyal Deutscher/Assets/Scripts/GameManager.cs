@@ -9,10 +9,24 @@ public class GameManager : MonoSingleton<GameManager>
     [SerializeField] UIManager _uiManager;
 
     public int ShotAmount => _shotAmount;
+    private void Awake()
+    {
+        base.Awake();
+        //this exist because when a player gets to the first level he needs to go back to the main menu scene
+
+        //load UI Manager for the first time
+        if(_uiManager == null)
+            _uiManager = FindObjectOfType<UIManager>();
+        //load InteractionManager for the first time before Level Handler!!!
+        if (_interactionManager == null)
+            _interactionManager = FindObjectOfType<InteractionManager>();
+
+    }
     private void Start()
     {
         DontDestroyOnLoad(this);
         _uiManager.UpdateScore(_score, true);
+        _uiManager.StartGameUI(false);
     }
     private void StartLevel()
     {
@@ -26,6 +40,7 @@ public class GameManager : MonoSingleton<GameManager>
             var firedObject = Instantiate(_firedObject, _levelHandler.SpawnPosition.position,Quaternion.identity);
             _interactionManager.SetObjectToShoot(firedObject);
             _shotAmount--;
+            _uiManager.UpdateShotAmount(_shotAmount);
         }
         else
         {
@@ -55,5 +70,14 @@ public class GameManager : MonoSingleton<GameManager>
     public void RestartLevel()
     {
         StartLevel();
+    }
+    public void StartGameplayUI()
+    {
+        _uiManager.StartGameUI(true);
+    }
+    public void RestartGame()
+    {
+        _uiManager.StartGameUI(false);
+        _uiManager.ResetScore();
     }
 }

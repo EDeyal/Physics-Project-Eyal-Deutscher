@@ -22,7 +22,8 @@ public class InteractionManager : MonoBehaviour
     }
     public void Awake()
     {
-        GameManager.Instance.SetInteractionManager(this);
+        if(GameManager.Instance != null)
+            GameManager.Instance.SetInteractionManager(this);
     }
     public void SetObjectToShoot(GameObject firedObject)
     {

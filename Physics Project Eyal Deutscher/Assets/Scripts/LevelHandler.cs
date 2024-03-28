@@ -15,22 +15,29 @@ public class LevelHandler : MonoBehaviour
     public int ShotsForThisLevel => _shotsForThisLevel;
     private void Start()
     {
-        GameManager.Instance.SetLevelManager(this,_shotsForThisLevel);
+        if(GameManager.Instance != null)    
+            GameManager.Instance.SetLevelManager(this,_shotsForThisLevel);
     }
     public void GoToNextLevel()
     {
-        if (sceneNumber +1 < _levels.Count)
+        var sceneNumberPlusOne = sceneNumber +1;
+        if (sceneNumberPlusOne < _levels.Count)
         {
+            if (sceneNumberPlusOne == 1)
+            { 
+                GameManager.Instance.StartGameplayUI();
+            }
             sceneNumber++;
             Debug.Log("Loading Scene:" + _levels[sceneNumber].name);
-            SceneManager.LoadScene(_levels[sceneNumber].name);
         }
         else
         {
             sceneNumber = 0;
-            SceneManager.LoadScene(_levels[sceneNumber].name);
+            GameManager.Instance.RestartGame();
         }
+        SceneManager.LoadScene(_levels[sceneNumber].name);
     }
+
     public void RestartLevel()
     {
         SceneManager.LoadScene(_levels[sceneNumber].name);
