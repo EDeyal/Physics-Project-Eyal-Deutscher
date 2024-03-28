@@ -36,7 +36,7 @@ public class RopeHandler : MonoSingleton<RopeHandler>
     {
         //get y difference between both loctions, that will be the amount of cubes between them
         //then place the cubes on a line between the 2 points
-        int amountOfCollidersNeeded = (int)(point1.y - point2.y);
+        int amountOfCollidersNeeded =(int)Vector2.Distance(point1 , point2);
         amountOfCollidersNeeded = Mathf.Abs(amountOfCollidersNeeded);
         //Debug.Log("Amount of colliders needed is: " + amountOfCollidersNeeded);
 
