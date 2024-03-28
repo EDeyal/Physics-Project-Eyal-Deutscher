@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rigidbody2D: {fileID: 0}
-  _mouseDragStrengthMultiplication: 100
+  _mouseDragStrengthMultiplication: 300
   _camera: {fileID: 0}
   _lineRenderer: {fileID: 4322739205630593870}
   _zLocation: -1

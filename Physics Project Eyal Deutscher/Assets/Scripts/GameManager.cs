@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 public class GameManager : MonoSingleton<GameManager>
 {
@@ -15,7 +16,7 @@ public class GameManager : MonoSingleton<GameManager>
         //this exist because when a player gets to the first level he needs to go back to the main menu scene
 
         //load UI Manager for the first time
-        if(_uiManager == null)
+        if (_uiManager == null)
             _uiManager = FindObjectOfType<UIManager>();
         //load InteractionManager for the first time before Level Handler!!!
         if (_interactionManager == null)
@@ -25,34 +26,48 @@ public class GameManager : MonoSingleton<GameManager>
     private void Start()
     {
         DontDestroyOnLoad(this);
-        _uiManager.UpdateScore(_score, true);
+        _uiManager.UpdateScore(0, true);
         _uiManager.StartGameUI(false);
+    }
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RestartLevel();
+        }
     }
     private void StartLevel()
     {
         _shotAmount = _levelHandler.ShotsForThisLevel;
         LoadNextShot();
+        _uiManager.UpdateShotAmount(_shotAmount);
+    }
+    public void ReduceShotAmount()
+    {
+        _shotAmount--;
+        _uiManager.UpdateShotAmount(_shotAmount);
     }
     public void LoadNextShot()
     {
         if (_shotAmount > 0)
         {
-            var firedObject = Instantiate(_firedObject, _levelHandler.SpawnPosition.position,Quaternion.identity);
+            var firedObject = Instantiate(_firedObject, _levelHandler.SpawnPosition.position, Quaternion.identity);
             _interactionManager.SetObjectToShoot(firedObject);
-            _shotAmount--;
-            _uiManager.UpdateShotAmount(_shotAmount);
         }
         else
         {
-            _uiManager.UpdateScore(_score,false);
-            Debug.Log("Defeat");
-            //move to first level
-            //reset Score
-            //Show defeat screen
+            StartCoroutine(WaitToDefeat());
         }
     }
+    public IEnumerator WaitToDefeat()
+    {
+        yield return new WaitForSeconds(4);
+
+        _uiManager.UpdateScore(_score, false);
+        _levelHandler.RestartLevel();
+    }
     public void SetInteractionManager(InteractionManager interactionManager)
-    { 
+    {
         _interactionManager = interactionManager;
     }
     public void SetLevelManager(LevelHandler levelManager, int shotAmount)
@@ -63,16 +78,21 @@ public class GameManager : MonoSingleton<GameManager>
     }
     public void LevelCompleted()
     {
-        _score++;
-        _uiManager.UpdateScore(_score,true);
+        if (LevelHandler.SceneNumber != 0)
+        { 
+            _score += _shotAmount;
+        }
+        _uiManager.UpdateScore(_score, true);
         _levelHandler.GoToNextLevel();
     }
     public void RestartLevel()
     {
         StartLevel();
+        _levelHandler.RestartLevel();
     }
     public void StartGameplayUI()
     {
+        _score = 0;
         _uiManager.StartGameUI(true);
     }
     public void RestartGame()

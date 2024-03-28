@@ -11,9 +11,10 @@ public class UIManager : MonoBehaviour
     int _currentScore;
 
     [SerializeField] TextMeshProUGUI _scoreText;
+    [SerializeField] TextMeshProUGUI _shotsLeftText;
     [SerializeField] GameObject _restart;
     [SerializeField] GameObject _score;
-    [SerializeField] TextMeshProUGUI _shotsLeft;
+    [SerializeField] GameObject _shotsLeft;
     [SerializeField] GameObject _tutorialText;
     void Start()
     {
@@ -30,20 +31,24 @@ public class UIManager : MonoBehaviour
         {
             _currentScore = _lastScore;
         }
-        _scoreText.text = _currentScore.ToString();
+        _scoreText.text = "Score: " +_currentScore.ToString();
     }
     public void UpdateShotAmount(int amount)
     {
-        _shotsLeft.text = "Shots left: " + amount.ToString();
+        _shotsLeftText.text = "Shots left: " + amount.ToString();
     }
     public void StartGameUI(bool isStarting)
     {
         _currentScore = 0;
         _lastScore = 0;
-        _score.gameObject.SetActive(isStarting);
+        _score.SetActive(isStarting);
         _restart.SetActive(isStarting);
-        _shotsLeft.gameObject.SetActive(isStarting);
+        _shotsLeft.SetActive(isStarting);
         _tutorialText.SetActive(!isStarting);
+    }
+    public void RestartLevel()
+    {
+        GameManager.Instance.RestartLevel();
     }
     public void ResetScore()
     {

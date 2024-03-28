@@ -50,6 +50,14 @@ MonoBehaviour:
   - {fileID: 102900000, guid: 81aa96e03c4afa9438a3118e7e0f7ab7, type: 3}
   - {fileID: 102900000, guid: 06c6fb85e68616b46a9f1f3b7fe1ca22, type: 3}
   - {fileID: 102900000, guid: 845eabcaaf7ca1a48b59c06317e5a443, type: 3}
+  - {fileID: 102900000, guid: 17af916e8f957f742a7f996d39519110, type: 3}
+  - {fileID: 102900000, guid: f305f0cc49d842a4b9aab7b9f43e4f63, type: 3}
+  - {fileID: 102900000, guid: 524c16ebeb575bf479043eea8e27ed36, type: 3}
+  - {fileID: 102900000, guid: 2fec29d72259fd940afda5a971acd17b, type: 3}
+  - {fileID: 102900000, guid: 293fa78c6795b884ba49b13853947128, type: 3}
+  - {fileID: 102900000, guid: ea74dff8cd5f7b743be227ac2972d601, type: 3}
+  - {fileID: 102900000, guid: e2b4f7f1a67c7d841943d8087a6b8529, type: 3}
+  - {fileID: 102900000, guid: e64d445dd43139d4e8a14b62918065a4, type: 3}
   _spawnPosition: {fileID: 3224789152758086171}
 --- !u!1 &6770595755150203852
 GameObject:

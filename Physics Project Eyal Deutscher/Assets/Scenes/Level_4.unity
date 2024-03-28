@@ -321,17 +321,22 @@ PrefabInstance:
     - target: {fileID: 1466960699662234722, guid: 198f4a278f638d443915bbfd134809eb,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 10
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1466960699662234722, guid: 198f4a278f638d443915bbfd134809eb,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 1466960699662234722, guid: 198f4a278f638d443915bbfd134809eb,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -12.5
+      value: 1.7
       objectReference: {fileID: 0}
     - target: {fileID: 1466960699662234722, guid: 198f4a278f638d443915bbfd134809eb,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -8.5
+      value: -0.5
       objectReference: {fileID: 0}
     - target: {fileID: 1466960699662234722, guid: 198f4a278f638d443915bbfd134809eb,
         type: 3}
@@ -750,7 +755,7 @@ PrefabInstance:
     - target: {fileID: 7202938252925760041, guid: b9ca9af86fac5384b8a54ed52e5efa1e,
         type: 3}
       propertyPath: _ropeAnchorPos.x
-      value: -3.5
+      value: -7.5
       objectReference: {fileID: 0}
     - target: {fileID: 7202938252925760043, guid: b9ca9af86fac5384b8a54ed52e5efa1e,
         type: 3}

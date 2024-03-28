@@ -75,13 +75,14 @@ public class InteractionManager : MonoBehaviour
         //Debug.Log("Direction is: " +direction);
 
         _rigidbody2D.AddForce(direction * _mouseDragStrengthMultiplication);
+        GameManager.Instance.ReduceShotAmount();
         StartCoroutine(LoadNextShotInXSeconds());
     }
 
     public IEnumerator LoadNextShotInXSeconds()
     { 
         _rigidbody2D = null;
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(2);
         //Debug.Log("LoadNextShot");
         GameManager.Instance.LoadNextShot();
     }

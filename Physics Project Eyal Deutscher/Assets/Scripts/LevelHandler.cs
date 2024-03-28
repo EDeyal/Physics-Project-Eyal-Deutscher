@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 public class LevelHandler : MonoBehaviour
 {
     static int sceneNumber;
+    public static int SceneNumber => sceneNumber;
     [SerializeField] int _shotsForThisLevel = 3;
     [SerializeField] List<SceneAsset> _levels;
     [SerializeField] Transform _spawnPosition;
@@ -29,25 +30,22 @@ public class LevelHandler : MonoBehaviour
             }
             sceneNumber++;
             Debug.Log("Loading Scene:" + _levels[sceneNumber].name);
+            SceneManager.LoadScene(_levels[sceneNumber].name);
         }
         else
         {
-            sceneNumber = 0;
-            GameManager.Instance.RestartGame();
+            RestartGame();
         }
-        SceneManager.LoadScene(_levels[sceneNumber].name);
     }
+    public void RestartGame()
+    {
+        sceneNumber = 0;
+        GameManager.Instance.RestartGame();
+        SceneManager.LoadScene(_levels[sceneNumber].name);
 
+    }
     public void RestartLevel()
     {
         SceneManager.LoadScene(_levels[sceneNumber].name);
-        GameManager.Instance.RestartLevel();
-    }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            RestartLevel();
-        }
     }
 }

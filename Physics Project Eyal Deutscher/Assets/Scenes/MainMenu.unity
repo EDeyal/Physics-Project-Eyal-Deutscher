@@ -509,11 +509,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4322739205630593864, guid: abf78bf250ebee4498764798df09a226,
-        type: 3}
-      propertyPath: _rigidbody2D
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 4322739205630593865, guid: abf78bf250ebee4498764798df09a226,
         type: 3}
       propertyPath: m_RootOrder
