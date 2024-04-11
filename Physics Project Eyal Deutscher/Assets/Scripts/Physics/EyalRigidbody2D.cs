@@ -6,6 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(EyalCollider))]
 public class EyalRigidbody2D : MonoBehaviour
 {
+    #region Fields
     static float _dragOffset = 0.01f;
     [SerializeField] float _mass;
     [SerializeField,Range(0,0.1f)] float _drag;
@@ -24,14 +25,17 @@ public class EyalRigidbody2D : MonoBehaviour
     [SerializeField] float _ropeStiffness;
     [SerializeField,Tooltip("Clamps the magnitude from 0 to this number")] float _maxMagnitudePerFrame = 10;
 
-    [Header("Do not Change, read only fields")]
+    [Header("Do not change, read only fields")]
     [SerializeField] Vector2 _totalAccelerationForce;
     [SerializeField] Vector2 _velocity;
     [SerializeField] List<Vector2> _accelerationForces;
     [SerializeField] List<Vector2> _activeForces;
     [SerializeField] List<Vector2> _nextActiveForces;
-    EyalCollider _collider;
     [SerializeField] List<CollisionData> _collisionData;
+    EyalCollider _collider;
+    #endregion
+
+    #region Properties
     public EyalCollider Collider => _collider;
     public float Bounceiness => _bounciness;
     public float Mass => _mass;
@@ -41,6 +45,7 @@ public class EyalRigidbody2D : MonoBehaviour
     public List<CollisionData> CollisionsData => _collisionData;
     public bool IsAttachedToRope => _isAttachedToRope;
     public Vector3 RopeAnchorPoint => _ropeAnchorPos;
+    #endregion
 
     private void Awake()
     {
@@ -49,7 +54,7 @@ public class EyalRigidbody2D : MonoBehaviour
 
         _collider = gameObject.GetComponent<EyalCollider>();
         if(_collider == null)
-            throw new System.Exception($"Rigidbody {gameObject.name} has no collider");
+            throw new System.Exception($"Rigidbody {gameObject.name} has no collider"); //rigidbody must have a collider
         _collider.SetRigidbody(this);
     }
 
@@ -73,8 +78,8 @@ public class EyalRigidbody2D : MonoBehaviour
 
         if (_hasGravity)
         {
-            if(!_accelerationForces.Contains(_gravityForce * Mass))
-                AddAccelerationForce(_gravityForce*Mass);
+            if(!_accelerationForces.Contains(_gravityForce * Mass)) //checks if it exists can cause a bug where another force of the same magnitude will prevent this force from adding
+                AddAccelerationForce(_gravityForce * Mass);
 
             if (_isGrounded)
             {
@@ -108,7 +113,6 @@ public class EyalRigidbody2D : MonoBehaviour
     {
         if (_isAttachedToRope)
         {
-            //Draw Rope
             Vector2 ropeForce = CalculatioRopeForce();
 
             AddForce(ropeForce);
@@ -147,7 +151,7 @@ public class EyalRigidbody2D : MonoBehaviour
         }
 
 
-        vector = new Vector2(newX, newY);
+        vector = new Vector2(newX, newY);//the reduced vector by drag force
 
         return vector;
     }
@@ -156,7 +160,7 @@ public class EyalRigidbody2D : MonoBehaviour
         var currentPos = (Vector2)transform.position;
         if (_lastPosition != currentPos)
         {
-            //let The Collision Manager to know about this movement
+            //let anyone that needs to move a notification
             OnPositionChanged?.Invoke(currentPos);
             _lastPosition = currentPos;
         }
@@ -167,12 +171,12 @@ public class EyalRigidbody2D : MonoBehaviour
         List<CollisionData> existingCollisions = new List<CollisionData>();
         foreach (var collisionData in _collisionData)
         {
-            if (CollisionManager.Instance.CheckObjectCollision(_collider, collisionData.Collider))
+            if (CollisionManager.Instance.CheckObjectCollision(_collider, collisionData.Collider))//check if they still collide
             {
-                existingCollisions.Add(collisionData);
+                existingCollisions.Add(collisionData);//check every collision in order to know if you are colliding with another object
             }
         }
-        _collisionData = existingCollisions;
+        _collisionData = existingCollisions;//updating current collisions
 
         //check is grounded
         _isGrounded = false;

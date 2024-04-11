@@ -57,7 +57,7 @@ public class CollisionManager : MonoSingleton<CollisionManager>
         bool triggerOverlap = false;
         bool hasCollided = true;
 
-        //AABB collision detection
+        //AABB collision detection on all colliders
         for (int i = 0; i < _colliders.Count; i++)
         {
             collider1 = _colliders[i];
@@ -73,6 +73,7 @@ public class CollisionManager : MonoSingleton<CollisionManager>
                 {
                     if (hasCollided)
                     {
+                        //add to collision data in order to resolve later
                         AssignCollisionsData(collider1, collider2, triggerOverlap);
                     }
                 }
@@ -82,6 +83,7 @@ public class CollisionManager : MonoSingleton<CollisionManager>
 
     public bool CheckObjectCollision(EyalCollider collider, EyalCollider otherCollider)
     {
+        //objects can call for a check if they collided with another object
         bool triggerOverlap = false;
         bool hasCollided = true;
 
@@ -96,6 +98,7 @@ public class CollisionManager : MonoSingleton<CollisionManager>
     }
     private bool AABBCollision(EyalCollider collider1, EyalCollider collider2, out bool hasCollided, out bool triggerOverlap)
     {
+        //The focus is on the collider 1 because every collider will have it's check as collider 1
         triggerOverlap = false;
         hasCollided = false;
 
@@ -134,8 +137,10 @@ public class CollisionManager : MonoSingleton<CollisionManager>
         }
         //We have collision
         hasCollided = true;
+        collider1.OnEyalCollisionEnter(collider2);
         //Debug.Log("Collision Accuring");
 
+        //create collision data on collider to know the side that was hit
         collider1.CollisionResolveDirection = GetResolveDirectionType(collider1Bounds, collider2Bounds);
 
         if (collider1.IsTrigger || collider2.IsTrigger)
@@ -305,9 +310,6 @@ public class CollisionManager : MonoSingleton<CollisionManager>
         float BounceStrength = Mathf.Abs(collider.Rigidbody.Bounceiness / collider.Rigidbody.Mass);//bounciness equasion, basically redirects the velocity to the new normalized vector
         //Debug.Log("Velocity " + collider.Rigidbody.Velocity);
         collider.Rigidbody.BounceRigidbody(resolveVector * BounceStrength);
-        //        Vector2 forceToAdd = resolveVector * BounceStrength;//multiply force by fixed delta time
-        //      Debug.Log("Added Force " + forceToAdd);
-        //    collider.Rigidbody.AddForce(forceToAdd);
     }
 
 }
